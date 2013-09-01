@@ -1,8 +1,7 @@
 module SIUnits
-
   class Unit
-
-    attr_reader :unit_value, :unit_kind, :unit_aliase
+    include Comparable
+    attr_reader :unit_value
 
     #SI Prefix Units
     UNITS_DEFINITION = {
@@ -40,21 +39,28 @@ module SIUnits
 
     def initialize(unit)
       @unit_value = unit
+      @unit_kind = parse_unit
     end
+
+    def parse
+      @unit_with_best_scale ||= best_scale
+    end
+
+    # def <=>(comparison)
+    #   UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
+    # end
+
+    private
 
     def best_scale
-      @unit_kind = parse @unit_value
-
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
-      @unit_value = unit_value / scalar
-      @unit_aliase = aliase.first
+      [@unit_value / scalar, aliase.first ].join
     end
 
-    def parse(absolute_unit_value)
-
-      case absolute_unit_value
+    def parse_unit
+      case @unit_value
       when 1e-15..1e-12 then return "pico"
-      when 1e-12..1e-9 thenreturn "nano"
+      when 1e-12..1e-9 then return "nano"
       when 1e-9..1e-6 then return "micro"
       when 1e-6..1e-3 then return "milli"
       when 1e-3..1e-2 then return "centi"
@@ -68,12 +74,6 @@ module SIUnits
       when 1e9..1e12 then return "giga"
       else raise "Unit out of range"
       end
-    end
-
-    include Comparable
-
-    def <=>(comparison)
-      UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
     end
 
   end
