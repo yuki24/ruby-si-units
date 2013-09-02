@@ -1,5 +1,4 @@
 module SIUnits
-
   class Distance
     include Comparable
 
@@ -30,5 +29,5 @@ module SIUnits
     def split_value(value)
       value.scan(UNIT_REGEX).flatten
     end
-
+  end
 end
