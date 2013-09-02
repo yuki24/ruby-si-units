@@ -42,19 +42,19 @@ module SIUnits
       @unit_kind = parse_unit
     end
 
-    def parse
-      @unit_with_best_scale ||= best_scale
+    def best_scale
+      @best_scale ||= best_value_with_scale
     end
 
-    # def <=>(comparison)
-    #   UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
-    # end
+    def <=>(comparison)
+      UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
+    end
 
     private
 
-    def best_scale
+    def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
-      [@unit_value / scalar, aliase.first ].join
+      [(@unit_value / scalar), aliase.first].join
     end
 
     def parse_unit

@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    ruby-si-units (0.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -26,3 +31,4 @@ DEPENDENCIES
   awesome_print (~> 1.1.0)
   pry (~> 0.9.12.2)
   rspec (~> 2.14.1)
+  ruby-si-units!
