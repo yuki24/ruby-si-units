@@ -1,5 +1,4 @@
-SI Prefix Units
-====================
+#SI Prefix Units
 	A SI prefix unit handling library for ruby
 
 How it work's ?
