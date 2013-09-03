@@ -1,6 +1,8 @@
 #SI Prefix Units
 	A SI prefix unit handling library for ruby
 
+[![Build Status](https://travis-ci.org/gnomex/ruby-si-units.png?branch=master)](https://travis-ci.org/gnomex/ruby-si-units)
+
 How it work's ?
 ===
 <p>
