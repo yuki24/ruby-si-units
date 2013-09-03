@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'spec_helper'
 
-shared_examples "is unit of" do |unit, expected_prefix|
+shared_examples_for "is unit of" do |unit, expected_prefix|
 
   it "is max limit on range" do
     expect(:unit.to_s).to eql(expected_prefix)

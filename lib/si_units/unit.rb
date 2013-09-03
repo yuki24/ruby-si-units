@@ -24,7 +24,7 @@ module SIUnits
       'kilo'   => [%w{k kilo},            1e3],
       'hecto'  => [%w{h Hecto hecto},     1e2],
       'deca'   => [%w{da Deca deca deka}, 1e1],
-      '1'      => [%w{const},                 1],
+      '1'      => [%w{const},                1],
       'deci'   => [%w{d Deci deci},       1e-1],
       'centi'  => [%w{c Centi centi},     1e-2],
       'milli'  => [%w{m Milli milli},     1e-3],
@@ -65,8 +65,7 @@ module SIUnits
       when 1e-6..1e-3 then return "milli"
       when 1e-3..1e-2 then return "centi"
       when 1e-2..1e-1 then return "deci"
-      when 1e-1..0e1 then return "1"
-      when 0e1..1e1 then return "1"
+      when 1e-1..1e1 then return "1"
       when 1e1..1e2 then return "deca"
       when 1e2..1e3 then return "hecto"
       when 1e3..1e6 then return "kilo"
