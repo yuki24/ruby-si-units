@@ -36,6 +36,7 @@ module SIUnits
       'zepto'  => [%w{z Zepto zepto},     1e-21],
       'yocto'  => [%w{y Yocto yocto},     1e-24]
     }
+    UNIT_REGEX = /(\d+)(\w+)/
 
     def initialize(unit)
       @unit_value = unit
@@ -48,6 +49,17 @@ module SIUnits
 
     def <=>(comparison)
       UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
+    end
+
+    # Convert string to a Unit
+    #   Example: "10k".to_unit
+    # => 10000.0
+    def to_unit
+      # @value, @unit = *split_value(distance)
+      unit_reduced, prefix = *split_value(self)
+      scalar = is_si_prefix prefix
+      @unit_value = unit_reduced * scalar
+      self.parse_unit
     end
 
     private
@@ -73,6 +85,14 @@ module SIUnits
       when 1e9..1e12 then return "giga"
       else raise "Unit out of range"
       end
+    end
+
+    def split_value(value)
+      value.scan(UNIT_REGEX).flatten
+    end
+
+    def is_si_prefix?(prefix)
+      # ...
     end
 
   end
