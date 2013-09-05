@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ruby-si-units (0.0.3)
+    ruby-si-units (0.0.4)
 
 GEM
   remote: https://rubygems.org/
