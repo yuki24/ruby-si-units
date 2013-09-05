@@ -36,7 +36,6 @@ module SIUnits
       'zepto'  => [%w{z Zepto zepto},     1e-21],
       'yocto'  => [%w{y Yocto yocto},     1e-24]
     }
-    UNIT_REGEX = /(\d+)(\w+)/
 
     def initialize(unit)
       @unit_value = unit
@@ -51,15 +50,13 @@ module SIUnits
       UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
     end
 
-    # Convert string to a Unit
-    #   Example: "10k".to_unit
-    # => 10000.0
-    def to_unit
-      # @value, @unit = *split_value(distance)
-      unit_reduced, prefix = *split_value(self)
-      scalar = is_si_prefix prefix
-      @unit_value = unit_reduced * scalar
-      self.parse_unit
+    # convert to a specified unit string or to the same units as another Unit
+    def convert_to(prefix)
+      return self if prefix.nil?
+      scalar = prefix_is_defined?(prefix)
+      absolute_unit_value = convert_base_prefix_to_value self.unit_value, scalar
+
+      SIUnits::Unit.new(absolute_unit_value)
     end
 
     private
@@ -67,6 +64,10 @@ module SIUnits
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
       [(@unit_value / scalar), aliase.first].join
+    end
+
+    def convert_base_prefix_to_value(value, scalar)
+      value * scalar
     end
 
     def parse_unit
@@ -87,13 +88,11 @@ module SIUnits
       end
     end
 
-    def split_value(value)
-      value.scan(UNIT_REGEX).flatten
+    def prefix_is_defined?(kind)
+      UNITS_DEFINITION.each { |key, value|
+        return value.last if value[0].include?(kind)
+      }
+      raise ArgumentError, "Unknown prefix"
     end
-
-    def is_si_prefix?(prefix)
-      # ...
-    end
-
   end
 end

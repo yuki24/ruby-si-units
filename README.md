@@ -1,10 +1,9 @@
-#SI Prefix Units
+# SI Prefix Units
 	A SI prefix unit handling library for ruby
 
 [![Build Status](https://travis-ci.org/gnomex/ruby-si-units.png?branch=master)](https://travis-ci.org/gnomex/ruby-si-units)
 
-How it work's ?
-===
+## How it work's ?
 <p>
   Makes a parce of an absolute value and identifies the scale of the unit that belongs SI, returning the unit in better representation along with the unit symbol prefixed
 </p>
@@ -13,15 +12,15 @@ How it work's ?
 
 Add in your application's Gemfile:
 
-    gem "ruby-si-units", "~> 0.0.3"
+    `gem "ruby-si-units", "~> 0.0.3"`
 
 And using blunder, execute:
 
-    $ bundle install
+    `$ bundle install`
 
 Or install it yourself:
 
-    $ gem install ruby-si-units
+    `$ gem install ruby-si-units`
 
 
 ## Usage
@@ -41,6 +40,15 @@ unit = SIUnits::Unit.new(0.000000001)
 unit.best_scale
 # => "1.0n"
 ```
+### Convert string to unit
+
+```ruby
+"10.0k".to_unit
+# => #<SIUnits::Unit:0x0000000175da90 @unit_value=10000.0, @unit_kind="kilo">
+
+"1n".to_unit
+# => #<SIUnits::Unit:0x000000017406e8 @unit_value=1.0e-09, @unit_kind="nano">
+```
 
 ## Contributing
 
@@ -50,7 +58,5 @@ unit.best_scale
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-
-Another useful resources
-===
+## Another useful resources
 * [ruby-units](https://github.com/olbrich/ruby-units)
