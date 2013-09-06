@@ -1,3 +1,4 @@
 module SIUnits
-  VERSION = "0.0.4"
+  # Project Version
+  VERSION = "0.0.5"
 end

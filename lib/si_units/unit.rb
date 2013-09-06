@@ -1,9 +1,15 @@
+#coding: utf-8
+# = SIUnits
+# A SI prefix unit handling library for ruby
+#
+# @author Kenner Kliemann
+# @see https://github.com/gnomex/ruby-si-units
 module SIUnits
   class Unit
     include Comparable
     attr_reader :unit_value
 
-    #SI Prefix Units
+    # Definition of SI Prefix Units, with name, aliases and scale
     UNITS_DEFINITION = {
       'googol' => [%w{googol},            1e100],
       'yebi'   => [%w{Yi Yebi yebi},      2**80],
@@ -34,18 +40,27 @@ module SIUnits
       'femto'  => [%w{f Femto femto},     1e-15],
       'atto'   => [%w{a Atto atto},       1e-18],
       'zepto'  => [%w{z Zepto zepto},     1e-21],
-      'yocto'  => [%w{y Yocto yocto},     1e-24]
+      'yocto'  => [%w{y Yocto yocto},     1e-24],
+      'zero'   => [%w{zero},                0.0]
     }
 
+    # Create a unit object
+    # Can be initialized with a number
+    # initialize a unit and parse, recognizing the scale of number
+    # @param [Fixnum|Float]
+    # @return Unit
     def initialize(unit)
       @unit_value = unit
       @unit_kind = parse_unit
     end
 
+    # Public call to get a unit best representation
+    # @return String
     def best_scale
       @best_scale ||= best_value_with_scale
     end
 
+    #
     def <=>(comparison)
       UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
     end
@@ -61,17 +76,28 @@ module SIUnits
 
     private
 
+    #Logic to convert the absolute value to a best form of representation
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
       [(@unit_value / scalar), aliase.first].join
     end
 
+    # Logic to convert a value with scale
+    # @return Float
     def convert_base_prefix_to_value(value, scalar)
       value * scalar
     end
 
+    # The parser
+    # => Finds that the number range is contained
+    # @return String with the name of representation
+    # @raise ArgumentError
     def parse_unit
       case @unit_value
+      when 0 then return "zero"
+      when 1e-24..1e-21 then return "yocto"
+      when 1e-21..1e-18 then return "atto"
+      when 1e-18..1e-15 then return "femto"
       when 1e-15..1e-12 then return "pico"
       when 1e-12..1e-9 then return "nano"
       when 1e-9..1e-6 then return "micro"
@@ -84,10 +110,17 @@ module SIUnits
       when 1e3..1e6 then return "kilo"
       when 1e6..1e9 then return "mega"
       when 1e9..1e12 then return "giga"
-      else raise "Unit out of range"
+      when 1e12..1e15 then return "tera"
+      when 1e15..1e18 then return "peta"
+      when 1e18..1e21 then return "exa"
+      when 1e21..1e24 then return "zetta"
+      else raise ArgumentError, "Unit out of range"
       end
     end
 
+    # Search on DEFINITIONS if the kind is a element
+    # @return Fixnum with scale of prefix
+    # @raise ArgumentError
     def prefix_is_defined?(kind)
       UNITS_DEFINITION.each { |key, value|
         return value.last if value[0].include?(kind)

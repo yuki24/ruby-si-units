@@ -105,23 +105,15 @@ describe "it's a deci " do
 end
 
 describe "it's a const " do
-  xit "max limit" do
-    unit = SIUnits::Unit.new((1e-1) + 0.1)
-    expect(unit.best_scale).to match(/const/)
+
+  it "zero" do
+    unit = SIUnits::Unit.new(0)
+    expect(unit.best_scale).to match(/zero/)
   end
 
-  xit "zero" do
-
-  end
-
-  xit "min limit" do
-    unit = SIUnits::Unit.new(1e1)
-    expect(unit.best_scale).to match(/cost/)
-  end
-
-  xit "not a const" do
-    unit = SIUnits::Unit.new((1e-2) + 0.00000000001)
-    expect(unit.best_scale).to_not match(/const/)
+  it "not a zero" do
+    unit = SIUnits::Unit.new(0.1)
+    expect(unit.best_scale).to_not match(/zero/)
   end
 end
 
