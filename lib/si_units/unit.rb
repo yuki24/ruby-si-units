@@ -76,9 +76,12 @@ module SIUnits
 
     private
 
-    #Logic to convert the absolute value to a best form of representation
+    # Logic to convert the absolute value to a best form of representation
+    # Only aliase if scalar is zero!
+    # => Don't raise a ZeroDivisionError, the zero is defined
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
+      return aliase.first if scalar == 0
       [(@unit_value / scalar), aliase.first].join
     end
 
