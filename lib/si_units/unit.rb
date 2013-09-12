@@ -43,15 +43,31 @@ module SIUnits
       'yocto'  => [%w{y Yocto yocto},     1e-24],
       'zero'   => [%w{zero},                0.0]
     }
+    UNIT_REGEX = /(\d+\.?\d*)(\w+)/
 
-    # Create a unit object
-    # Can be initialized with a number
-    # initialize a unit and parse, recognizing the scale of number
-    # @param [Fixnum|Float]
-    # @return Unit
-    def initialize(unit)
-      @unit_value = unit
-      @unit_kind = parse_unit
+    # Create a new Unit object.
+    # @return [Unit]
+    # @raise [ArgumentError] if absolute value of a temperature is less than absolute zero
+    # @raise [ArgumentError] if no unit is specified
+    # @raise [ArgumentError] if an invalid unit is specified
+    def initialize(*options)
+      @unit_value  = nil #unit value
+      # @base_scalar = nil #SI scale
+      @unit_kind   = nil
+
+      raise ArgumentError, "Invalid Unit Format" if options[0].nil?
+
+      case options[0]
+      when Numeric
+        @unit_value = options.first
+        @unit_kind = parse_unit
+      when String
+        value, prefix = *split_value(options[0])
+        @unit_value = value.to_f
+        @unit_kind = who_is_my_prefix?(prefix)
+      else
+        raise ArgumentError, "Invalid Unit Format"
+      end
     end
 
     # Public call to get a unit best representation
@@ -65,14 +81,23 @@ module SIUnits
       UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
     end
 
-    # convert to a specified unit string or to the same units as another Unit
-    def convert_to(prefix)
-      return self if prefix.nil?
-      scalar = prefix_is_defined?(prefix)
-      absolute_unit_value = convert_base_prefix_to_value self.unit_value, scalar
+    # convert to a specified unit string or to the same unit as another Unit
+    def convert_to(other)
+      return self if other.nil?
 
-      SIUnits::Unit.new(absolute_unit_value)
+      case other
+        when Unit
+          # return self if other.units == self.units
+          target = other
+        when String
+          target = SIUnits::Unit.new(other.to_f)
+        else
+          raise ArgumentError, "Unknown target units"
+      end
+      # SIUnits::Unit.new(absolute_unit_value)
     end
+
+    alias :>> :convert_to
 
     private
 
@@ -87,6 +112,7 @@ module SIUnits
 
     # Logic to convert a value with scale
     # @return Float
+    # all scales are defined with 1e(+|-)1, then just multiply the scalar
     def convert_base_prefix_to_value(value, scalar)
       value * scalar
     end
@@ -121,14 +147,15 @@ module SIUnits
       end
     end
 
-    # Search on DEFINITIONS if the kind is a element
-    # @return Fixnum with scale of prefix
-    # @raise ArgumentError
-    def prefix_is_defined?(kind)
+    def who_is_my_prefix?(prefix)
       UNITS_DEFINITION.each { |key, value|
-        return value.last if value[0].include?(kind)
+        return key if value[0].include?(prefix)
       }
       raise ArgumentError, "Unknown prefix"
+    end
+
+    def split_value(value)
+      value.scan(UNIT_REGEX).flatten
     end
   end
 end
