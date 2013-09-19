@@ -52,11 +52,8 @@ module SIUnits
     # @raise [ArgumentError] if no unit is specified
     # @raise [ArgumentError] if an invalid unit is specified
     def initialize(*options)
-      @unit_value  = nil #unit value
-      # @base_scalar = nil #SI scale => ?????
-      @unit_kind   = nil
 
-      raise ArgumentError, "Invalid Unit Format" if options[0].nil?
+      raise ArgumentError, "Unit can't be initialized without args" if options[0].nil?
 
       case options[0]
       when Numeric
@@ -74,7 +71,7 @@ module SIUnits
     # Public call to get a unit best representation
     # @return String
     def best_scale
-      @best_scale ||= best_value_with_scale
+      # @best_scale ||= best_value_with_scale
     end
 
     # Comparable units
@@ -83,39 +80,39 @@ module SIUnits
       UNITS_DEFINITION[unit_kind].last <=> UNITS_DEFINITION[comparison.unit_kind].last
     end
 
+    def ==(comparison)
+      unit_kind == comparison.unit_kind
+    end
     # convert to a specified unit string or to the same unit as another Unit
     def convert_to(other)
       return self if other.nil?
 
       case other
         when Unit
-          # return self if other.units == self.units
+          return self if other == self
           target = other
         when String
           target = SIUnits::Unit.new(other.to_f)
         else
           raise ArgumentError, "Unknown target units"
       end
-      # SIUnits::Unit.new(absolute_unit_value)
     end
 
     alias :>> :convert_to
 
     def to_s
+      # Print only the best_scale value, and kind
       "#{"%.2f" % unit_value } #{ unit_kind }"
     end
 
     private
 
-    # Logic to convert the absolute value to a best form of representation
-    # Only aliase if scalar is zero!
-    # => Don't raise a ZeroDivisionError, the zero is defined
+    # Logic to convert the current unit value to a best form of representation
+    #  Nothing happens if unit are in best scale
     # Convert value, where first decimal needs must be > 0, except zero (0)
-    # => Like 1000.0 => 1.0e3, 0.01 => 1.0e-2
+    # => Like 1000.0 => 1.0e3, 0.01 => 1.0e-2, zero are zero 0 => 0
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
-      #When is zero
-      return aliase.first if scalar == 0
 
       # [(@unit_value * scalar), aliase.first].join
     end
