@@ -7,7 +7,8 @@
 module SIUnits
   class Unit
     include Comparable
-    attr_reader :unit_value
+
+    attr_reader :unit_value, :unit_kind
 
     # Definition of SI Prefix Units, with name, aliases and scale
     UNITS_DEFINITION = {
@@ -52,7 +53,7 @@ module SIUnits
     # @raise [ArgumentError] if an invalid unit is specified
     def initialize(*options)
       @unit_value  = nil #unit value
-      # @base_scalar = nil #SI scale
+      # @base_scalar = nil #SI scale => ?????
       @unit_kind   = nil
 
       raise ArgumentError, "Invalid Unit Format" if options[0].nil?
@@ -76,9 +77,10 @@ module SIUnits
       @best_scale ||= best_value_with_scale
     end
 
-    #
+    # Comparable units
+    # => Compare with scale of kinds
     def <=>(comparison)
-      UNITS_DEFINITION.find_index(@unit_kind) <=> UNITS_DEFINITION.find_index(comparison.unit_kind)
+      UNITS_DEFINITION[unit_kind].last <=> UNITS_DEFINITION[comparison.unit_kind].last
     end
 
     # convert to a specified unit string or to the same unit as another Unit
@@ -100,7 +102,7 @@ module SIUnits
     alias :>> :convert_to
 
     def to_s
-      "#{"%.2f" % unit_value } #{ @unit_kind }"
+      "#{"%.2f" % unit_value } #{ unit_kind }"
     end
 
     private
@@ -108,10 +110,14 @@ module SIUnits
     # Logic to convert the absolute value to a best form of representation
     # Only aliase if scalar is zero!
     # => Don't raise a ZeroDivisionError, the zero is defined
+    # Convert value, where first decimal needs must be > 0, except zero (0)
+    # => Like 1000.0 => 1.0e3, 0.01 => 1.0e-2
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
+      #When is zero
       return aliase.first if scalar == 0
-      [(@unit_value * scalar), aliase.first].join
+
+      # [(@unit_value * scalar), aliase.first].join
     end
 
     # Logic to convert a value with scale
