@@ -99,6 +99,10 @@ module SIUnits
 
     alias :>> :convert_to
 
+    def to_s
+      "#{"%.2f" % unit_value } #{ @unit_kind }"
+    end
+
     private
 
     # Logic to convert the absolute value to a best form of representation
@@ -107,7 +111,7 @@ module SIUnits
     def best_value_with_scale
       aliase, scalar = UNITS_DEFINITION[@unit_kind]
       return aliase.first if scalar == 0
-      [(@unit_value / scalar), aliase.first].join
+      [(@unit_value * scalar), aliase.first].join
     end
 
     # Logic to convert a value with scale
