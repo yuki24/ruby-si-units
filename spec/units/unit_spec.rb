@@ -212,4 +212,8 @@ describe SIUnits::Unit do
     it "Convert to"
   end
 
+  context "Convert string to unit" do
+    it "string to unit"
+  end
+
 end

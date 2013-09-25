@@ -57,12 +57,16 @@ module SIUnits
 
       case options[0]
       when Numeric
+        # Conversion use a scale
         @unit_value = options.first
         @unit_kind = parse_unit
+
       when String
         value, prefix = *split_value(options[0])
-        @unit_value = value.to_f
         @unit_kind = who_is_my_prefix?(prefix)
+        # Value is absolute, needs convert to scale of prefix
+        @unit_value = value.to_f * unit_scale
+
       else
         raise ArgumentError, "Invalid Unit Format"
       end
@@ -71,7 +75,7 @@ module SIUnits
     # Public call to get a unit best representation
     # @return String
     def best_scale
-      # @best_scale ||= best_value_with_scale
+       @best_scale ||= best_value_with_scale
     end
 
     # Comparable units
@@ -83,6 +87,7 @@ module SIUnits
     def ==(comparison)
       unit_kind == comparison.unit_kind
     end
+
     # convert to a specified unit string or to the same unit as another Unit
     def convert_to(other)
       return self if other.nil?
@@ -101,27 +106,15 @@ module SIUnits
     alias :>> :convert_to
 
     def to_s
-      # Print only the best_scale value, and kind
-      "#{"%.2f" % unit_value } #{ unit_kind }"
+      [best_scale, unit_kind].join(' ')
     end
 
     private
 
     # Logic to convert the current unit value to a best form of representation
-    #  Nothing happens if unit are in best scale
-    # Convert value, where first decimal needs must be > 0, except zero (0)
-    # => Like 1000.0 => 1.0e3, 0.01 => 1.0e-2, zero are zero 0 => 0
+    # == Just remove the "e base" from value
     def best_value_with_scale
-      aliase, scalar = UNITS_DEFINITION[@unit_kind]
-
-      # [(@unit_value * scalar), aliase.first].join
-    end
-
-    # Logic to convert a value with scale
-    # @return Float
-    # all scales are defined with 1e(+|-)1, then just multiply the scalar
-    def convert_base_prefix_to_value(value, scalar)
-      value * scalar
+      (unit_value / unit_scale).round(4)
     end
 
     # The parser
@@ -159,6 +152,10 @@ module SIUnits
         return key if value[0].include?(prefix)
       }
       raise ArgumentError, "Unknown prefix"
+    end
+
+    def unit_scale
+      @unit_scale ||= UNITS_DEFINITION[unit_kind].last
     end
 
     def split_value(value)
