@@ -1,3 +1,3 @@
-require 'si_units/string'
-require 'si_units/unit'
-require 'si_units/version'
+require_relative 'si_units/string'
+require_relative 'si_units/unit'
+require_relative 'si_units/version'

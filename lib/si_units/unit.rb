@@ -8,7 +8,7 @@ module SIUnits
   class Unit
     include Comparable
 
-    attr_reader :unit_value, :unit_kind
+    attr_reader :value, :kind
 
     # Definition of SI Prefix Units, with name, aliases and scale
     UNITS_DEFINITION = {
@@ -44,7 +44,7 @@ module SIUnits
       'yocto'  => [%w{y Yocto yocto},     1e-24],
       'zero'   => [%w{zero},                0.0]
     }
-    UNIT_REGEX = /(\d+\.?\d*)(\w+)/
+    UNIT_REGEX = /\d+[\.?]\d+|\w+/
 
     # Create a new Unit object.
     # @return [Unit]
@@ -58,14 +58,14 @@ module SIUnits
       case options[0]
       when Numeric
         # Conversion use a scale
-        @unit_value = options.first
-        @unit_kind = parse_unit
+        @value = options.first
+        @kind = parse_unit
 
       when String
         value, prefix = *split_value(options[0])
-        @unit_kind = who_is_my_prefix?(prefix)
+        @kind = who_is_my_prefix?(prefix)
         # Value is absolute, needs convert to scale of prefix
-        @unit_value = value.to_f * unit_scale
+        @value = value.to_f * scale
 
       else
         raise ArgumentError, "Invalid Unit Format"
@@ -81,11 +81,11 @@ module SIUnits
     # Comparable units
     # => Compare with scale of kinds
     def <=>(comparison)
-      UNITS_DEFINITION[unit_kind].last <=> UNITS_DEFINITION[comparison.unit_kind].last
+      UNITS_DEFINITION[kind].last <=> UNITS_DEFINITION[comparison.kind].last
     end
 
     def ==(comparison)
-      unit_kind == comparison.unit_kind
+      kind == comparison.kind
     end
 
     # convert to a specified unit string or to the same unit as another Unit
@@ -106,7 +106,7 @@ module SIUnits
     alias :>> :convert_to
 
     def to_s
-      [best_scale, unit_kind].join(' ')
+      [best_scale, kind].join(' ')
     end
 
     private
@@ -114,7 +114,7 @@ module SIUnits
     # Logic to convert the current unit value to a best form of representation
     # == Just remove the "e base" from value
     def best_value_with_scale
-      (unit_value / unit_scale).round(4)
+      (value / scale).round(4)
     end
 
     # The parser
@@ -122,40 +122,65 @@ module SIUnits
     # @return String with the name of representation
     # @raise ArgumentError
     def parse_unit
-      case @unit_value
-      when 0 then return "zero"
-      when 1e-24..1e-21 then return "yocto"
-      when 1e-21..1e-18 then return "atto"
-      when 1e-18..1e-15 then return "femto"
-      when 1e-15..1e-12 then return "pico"
-      when 1e-12..1e-9 then return "nano"
-      when 1e-9..1e-6 then return "micro"
-      when 1e-6..1e-3 then return "milli"
-      when 1e-3..1e-2 then return "centi"
-      when 1e-2..1e-1 then return "deci"
-      when 1e-1..1e1 then return "1"
-      when 1e1..1e2 then return "deca"
-      when 1e2..1e3 then return "hecto"
-      when 1e3..1e6 then return "kilo"
-      when 1e6..1e9 then return "mega"
-      when 1e9..1e12 then return "giga"
-      when 1e12..1e15 then return "tera"
-      when 1e15..1e18 then return "peta"
-      when 1e18..1e21 then return "exa"
-      when 1e21..1e24 then return "zetta"
-      else raise ArgumentError, "Unit out of range"
+      case @value
+      when 0
+        return "zero"
+      when 1e-24..1e-21
+        return "yocto"
+      when 1e-21..1e-18
+        return "atto"
+      when 1e-18..1e-15
+        return "femto"
+      when 1e-15..1e-12
+        return "pico"
+      when 1e-12..1e-9
+        return "nano"
+      when 1e-9..1e-6
+        return "micro"
+      when 1e-6..1e-3
+        return "milli"
+      when 1e-3..1e-2
+        return "centi"
+      when 1e-2..1e-1
+        return "deci"
+      when 1e-1..1e1
+        return "1"
+      when 1e1..1e2
+        return "deca"
+      when 1e2..1e3
+        return "hecto"
+      when 1e3..1e6
+        return "kilo"
+      when 1e6..1e9
+        return "mega"
+      when 1e9..1e12
+        return "giga"
+      when 1e12..1e15
+        return "tera"
+      when 1e15..1e18
+        return "peta"
+      when 1e18..1e21
+        return "exa"
+      when 1e21..1e24
+        return "zetta"
+      else
+        raise ArgumentError, "Unit out of range"
       end
     end
 
     def who_is_my_prefix?(prefix)
-      UNITS_DEFINITION.each { |key, value|
+
+      prefix unless UNITS_DEFINITION.has_key?(prefix)
+
+      UNITS_DEFINITION.each do |key, value|
         return key if value[0].include?(prefix)
-      }
+      end
+
       raise ArgumentError, "Unknown prefix"
     end
 
-    def unit_scale
-      @unit_scale ||= UNITS_DEFINITION[unit_kind].last
+    def scale
+      @scale ||= UNITS_DEFINITION[kind].last
     end
 
     def split_value(value)

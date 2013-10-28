@@ -1,4 +1,4 @@
 module SIUnits
-  # Project Version
-  VERSION = "0.0.7"
+  #GEM version
+  VERSION = "0.0.8"
 end
