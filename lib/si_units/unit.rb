@@ -123,46 +123,26 @@ module SIUnits
     # @raise ArgumentError
     def parse_unit
       case @value
-      when 0
-        return "zero"
-      when 1e-24..1e-21
-        return "yocto"
-      when 1e-21..1e-18
-        return "atto"
-      when 1e-18..1e-15
-        return "femto"
-      when 1e-15..1e-12
-        return "pico"
-      when 1e-12..1e-9
-        return "nano"
-      when 1e-9..1e-6
-        return "micro"
-      when 1e-6..1e-3
-        return "milli"
-      when 1e-3..1e-2
-        return "centi"
-      when 1e-2..1e-1
-        return "deci"
-      when 1e-1..1e1
-        return "1"
-      when 1e1..1e2
-        return "deca"
-      when 1e2..1e3
-        return "hecto"
-      when 1e3..1e6
-        return "kilo"
-      when 1e6..1e9
-        return "mega"
-      when 1e9..1e12
-        return "giga"
-      when 1e12..1e15
-        return "tera"
-      when 1e15..1e18
-        return "peta"
-      when 1e18..1e21
-        return "exa"
-      when 1e21..1e24
-        return "zetta"
+      when 0 then "zero"
+      when 1e-24..1e-21 then "yocto"
+      when 1e-21..1e-18 then "atto"
+      when 1e-18..1e-15 then "femto"
+      when 1e-15..1e-12 then "pico"
+      when 1e-12..1e-9 then "nano"
+      when 1e-9..1e-6 then "micro"
+      when 1e-6..1e-3 then "milli"
+      when 1e-3..1e-2 then "centi"
+      when 1e-2..1e-1 then "deci"
+      when 1e-1..1e1 then "1"
+      when 1e1..1e2 then "deca"
+      when 1e2..1e3 then "hecto"
+      when 1e3..1e6 then "kilo"
+      when 1e6..1e9 then "mega"
+      when 1e9..1e12 then "giga"
+      when 1e12..1e15 then "tera"
+      when 1e15..1e18 then "peta"
+      when 1e18..1e21 then "exa"
+      when 1e21..1e24 then "zetta"
       else
         raise ArgumentError, "Unit out of range"
       end
