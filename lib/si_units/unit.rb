@@ -44,29 +44,26 @@ module SIUnits
       'yocto'  => [%w{y Yocto yocto},     1e-24],
       'zero'   => [%w{zero},                0.0]
     }
-    UNIT_REGEX = /\d+[\.?]\d+|\w+/
+    UNIT_REGEX = /^(?:[1-9]\d*|0)(?:\.\d+)?\s*\w/
 
     # Create a new Unit object.
-    # @return [Unit]
-    # @raise [ArgumentError] if absolute value of a temperature is less than absolute zero
+    # => Initialize with a numeric or string
     # @raise [ArgumentError] if no unit is specified
     # @raise [ArgumentError] if an invalid unit is specified
-    def initialize(*options)
+    def initialize(options)
+      raise ArgumentError, "Unit can't be initialized without args" if options.nil?
 
-      raise ArgumentError, "Unit can't be initialized without args" if options[0].nil?
-
-      case options[0]
+      case options
       when Numeric
-        # Conversion use a scale
-        @value = options.first
+        @value = options.to_f # Force evaluation to float!
         @kind = parse_unit
 
       when String
-        value, prefix = *split_value(options[0])
+        value, prefix = *split_value(options)
+
         @kind = who_is_my_prefix?(prefix)
         # Value is absolute, needs convert to scale of prefix
         @value = value.to_f * scale
-
       else
         raise ArgumentError, "Invalid Unit Format"
       end
@@ -149,7 +146,6 @@ module SIUnits
     end
 
     def who_is_my_prefix?(prefix)
-
       prefix unless UNITS_DEFINITION.has_key?(prefix)
 
       UNITS_DEFINITION.each do |key, value|
@@ -163,6 +159,10 @@ module SIUnits
       @scale ||= UNITS_DEFINITION[kind].last
     end
 
+=begin
+  The split_value method can returns two params, the numeric and kind
+  BUT he can't do this!!!
+=end
     def split_value(value)
       value.scan(UNIT_REGEX).flatten
     end
