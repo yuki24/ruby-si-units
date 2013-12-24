@@ -44,7 +44,7 @@ module SIUnits
       'yocto'  => [%w{y Yocto yocto},     1e-24],
       'zero'   => [%w{zero},                0.0]
     }
-    UNIT_REGEX = /^(?:[1-9]\d*|0)(?:\.\d+)?\s*\w/
+    UNIT_REGEX = /(^(?:[1-9]\d*|0)(?:\.\d+)?)(\s*\w)$/
 
     # Create a new Unit object.
     # => Initialize with a numeric or string
@@ -59,7 +59,7 @@ module SIUnits
         @kind = parse_unit
 
       when String
-        value, prefix = *split_value(options)
+        value, prefix = split_value(options.split.join)
 
         @kind = who_is_my_prefix?(prefix)
         # Value is absolute, needs convert to scale of prefix
@@ -159,10 +159,6 @@ module SIUnits
       @scale ||= UNITS_DEFINITION[kind].last
     end
 
-=begin
-  The split_value method can returns two params, the numeric and kind
-  BUT he can't do this!!!
-=end
     def split_value(value)
       value.scan(UNIT_REGEX).flatten
     end
