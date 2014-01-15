@@ -44,7 +44,7 @@ module SIUnits
       'yocto'  => [%w{y Yocto yocto},     1e-24],
       'zero'   => [%w{zero},                0.0]
     }
-    UNIT_REGEX = /(^(?:[1-9]\d*|0)(?:\.\d+)?)(\s*\w)$/
+    UNIT_REGEX = /(^(?:[1-9]\d*|0)(?:\.\d+)?)(\s*\w)?/
 
     # Create a new Unit object.
     # => Initialize with a numeric or string
@@ -61,9 +61,15 @@ module SIUnits
       when String
         value, prefix = split_value(options.split.join)
 
-        @kind = who_is_my_prefix?(prefix)
-        # Value is absolute, needs convert to scale of prefix
-        @value = value.to_f * scale
+        if prefix.nil?
+          @value = value.to_f
+          @kind = parse_unit
+        else
+          @kind = who_is_my_prefix?(prefix)
+          # Value is absolute, needs convert to scale of prefix
+          @value = value.to_f * scale
+        end
+
       else
         raise ArgumentError, "Invalid Unit Format"
       end
