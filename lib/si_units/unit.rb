@@ -1,4 +1,5 @@
-#coding: utf-8
+require 'bigdecimal'
+
 # = SIUnits
 # A SI prefix unit handling library for ruby
 #
@@ -55,19 +56,19 @@ module SIUnits
 
       case options
       when Numeric
-        @value = options.to_f # Force evaluation to float!
+        @value = BigDecimal(options) # Force evaluation to float!
         @kind = parse_unit
 
       when String
         value, prefix = split_value(options.split.join)
 
         if prefix.nil?
-          @value = value.to_f
+          @value = BigDecimal(value)
           @kind = parse_unit
         else
           @kind = who_is_my_prefix?(prefix)
           # Value is absolute, needs convert to scale of prefix
-          @value = value.to_f * scale
+          @value = BigDecimal(value) * scale
         end
 
       else
